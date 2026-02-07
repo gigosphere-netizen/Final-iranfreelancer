@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>فریلنسر هوشمند</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    p {
+      color: #666;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      resize: vertical;
+      transition: border-color 0.3s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border-right: 4px solid #667eea;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .result p {
+      color: #333;
+      text-align: right;
+      line-height: 1.8;
+      margin: 0;
+    }
+
+    .copy-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: #218838;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>بیوی فریلنسرت رو بساز!</h1>
+    <p>مهارت‌هات رو بنویس، ما برات یه بیوی حرفه‌ای تولید می‌کنیم.</p>
+
+    <textarea id="skills" placeholder="مثال: طراح گرافیک، متخصص در برندینگ، فارسی‌زبان..."></textarea>
+    <button id="generate" onclick="generateBio()">تولید بیو ✨</button>
+
+    <div id="result" class="result">
+      <h3>✅ بیوی تولید شده:</h3>
+      <p id="bioText"></p>
+      <button class="copy-btn" onclick="copyBio()">📋 کپی بیو</button>
+    </div>
+  </div>
+
+  <script>
+    const bioTemplates = [
+      (skills) => `👋 سلام! من یک ${skills} هستم. عاشق چالش‌های جدیدم و همیشه به دنبال یادگیری بیشتر. بیایید با هم پروژه‌های عالی بسازیم! 🚀`,
+      (skills) => `🎯 ${skills} با تجربه‌ی چندین ساله. تخصص من در تحویل به‌موقع و باکیفیت پروژه‌هاست. مشتری مداری اولویت منه! 💪`,
+      (skills) => `✨ ${skills} | متعهد به کیفیت و جزئیات. هر پروژه رو مثل پروژه‌ی خودم انجام میدم. آماده‌ی همکاری حرفه‌ای! 🤝`,
+      (skills) => `🎨 خلاق و حرفه‌ای در ${skills}. تبدیل ایده‌های شما به واقعیت با بهترین کیفیت ممکن. بیایید شروع کنیم! ⭐`,
+      (skills) => `💼 ${skills} | کارآمد، مسئولیت‌پذیر و متعهد. اعتبار من رضایت مشتریان قبلی‌ام است. منتظر همکاری با شما! 🌟`
+    ];
+
+    function generateBio() {
+      const skillsInput = document.getElementById('skills');
+      const resultDiv = document.getElementById('result');
+      const bioText = document.getElementById('bioText');
+      const generateBtn = document.getElementById('generate');
+      
+      const skills = skillsInput.value.trim();
+      
+      if (!skills) {
+        alert('لطفاً مهارت‌های خود را وارد کنید!');
+        return;
+      }
+
+      // Show loading
+      generateBtn.innerHTML = '<span class="loading"></span> در حال تولید...';
+      generateBtn.disabled = true;
+
+      // Simulate processing
+      setTimeout(() => {
+        const randomTemplate = bioTemplates[Math.floor(Math.random() * bioTemplates.length)];
+        const generatedBio = randomTemplate(skills);
+        
+        bioText.textContent = generatedBio;
+        resultDiv.classList.add('show');
+        
+        // Reset button
+        generateBtn.innerHTML = 'تولید بیو جدید ✨';
+        generateBtn.disabled = false;
+      }, 1500);
+    }
+
+    function copyBio() {
+      const bioText = document.getElementById('bioText').textContent;
+      
+      navigator.clipboard.writeText(bioText).then(() => {
+        const copyBtn = document.querySelector('.copy-btn');
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '✅ کپی شد!';
+        copyBtn.style.background = '#17a2b8';
+        
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+          copyBtn.style.background = '#28a745';
+        }, 2000);
+      }).catch(err => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = bioText;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        alert('بیو کپی شد!');
+      });
+    }
+
+    // Allow Enter key to generate (with Ctrl/Cmd)
+    document.getElementById('skills').addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        generateBio();
+      }
+    });
+  </script>
+</body>
+</html>
+
